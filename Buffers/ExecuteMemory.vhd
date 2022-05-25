@@ -16,7 +16,7 @@ entity ExecuteMemory is
         ALU_Result_out : out std_logic_vector(31 downto 0);
         ReadData1_out : out std_logic_vector(31 downto 0);
         WBAddress_out : out std_logic_vector(2 downto 0); --Rdst address
-        RegWB_enable_out : out std_logic
+        RegWB_enable_out : out std_logic;
 
         --memory and stack control 8 bits
         MemWriteEnable_in : in std_logic;
@@ -33,7 +33,7 @@ entity ExecuteMemory is
         NewOrOldSP_out : out std_logic;
         SP_Or_ALU_Result_out : out std_logic;
         ReadData1_Or_PC_Added1_out : out std_logic;
-        WBValue_ALU_OR_Memory_out : out std_logic
+        WBValue_ALU_OR_Memory_out : out std_logic;
         MEM_Read_in: in std_logic;
         MEM_Read_out: out std_logic;
 
