@@ -77,34 +77,34 @@ signal dataIN : std_logic_vector(188 downto 0);
 signal dataOUT : std_logic_vector(188 downto 0);
 signal En : std_logic;
 begin
-dataIN <= jump_signal_in & jump_enable_in & ret_signal_in --jump signals
+dataIN <= PC_Added1_in & inport_in & ReadData1_in & ReadData2_in & ExtendedImmOrOffset_in & ALU_OP_in & ReadData2_Or_Imm_in & WBAddress_in & RegWB_enable_in & Inport_Or_ALU_in & outport_DecEx_in --inputs
 & MEM_Read_in & Rsrc_in & MemWriteEnable_in & SPEnable_in & SelectorSP_in & NewOrOldSP_in & SP_Or_ALU_Result_in & ReadData1_Or_PC_Added1_in & WBValue_ALU_OR_Memory_in & ReadData1_Or_ReadData2_in -- second operand and memory and stack control
-& outport_DecEx_in & PC_Added1_in & inport_in & ReadData1_in & ReadData2_in & ExtendedImmOrOffset_in & ALU_OP_in & ReadData2_Or_Imm_in & WBAddress_in & RegWB_enable_in & Inport_Or_ALU_in; --inputs
+jump_signal_in & jump_enable_in & ret_signal_in --jump signals
 En <= '0' when stall = '1' else '1';
 reg: mynDFF port map(clk,flush,En,dataIN,dataOUT);
 
-jump_signal_out <= dataOUT(188 downto 187);
-jump_enable_out <= dataOUT(186);
-ret_signal_out <= dataOUT(185);
-MEM_Read_out <= dataOUT(184);
-Rsrc_out <= dataOUT(183 downto 181);
-MemWriteEnable_out <= dataOUT(180);
-SPEnable_out <= dataOUT(179);
-SelectorSP_out <= dataOUT(178);
-NewOrOldSP_out <= dataOUT(177);
-SP_Or_ALU_Result_out <= dataOUT(176);
-ReadData1_Or_PC_Added1_out <= dataOUT(175);
-WBValue_ALU_OR_Memory_out <= dataOUT(174);
-ReadData1_Or_ReadData2_out <= dataOUT(173 downto 172);
-outport_DecEx_out <= dataOUT(171);
-PC_Added1_out <= dataOUT(170 downto 139);
-inport_out <= dataOUT(138 downto 107);
-ReadData1_out <= dataOUT(106 downto 75);
-ReadData2_out <= dataOUT(74 downto 43);
-ExtendedImmOrOffset_out <= dataOUT(42 downto 11);
-ALU_OP_out <= dataOUT(10 downto 7);
-ReadData2_Or_Imm_out <= dataOUT(6 downto 5);
-WBAddress_out <= dataOUT(4 downto 2);
-RegWB_enable_out <= dataOUT(1);
-Inport_Or_ALU_out <= dataOUT(0);
+PC_Added1_out <= dataOUT(188 downto 157);
+inport_out <= dataOUT(156 downto 125);
+ReadData1_out <= dataOUT(124 downto 93);
+ReadData2_out <= dataOUT(92 downto 61);
+ExtendedImmOrOffset_out <= dataOUT(60 downto 29);
+ALU_OP_out <= dataOUT(28 downto 25);
+ReadData2_Or_Imm_out <= dataOUT(24 downto 23);
+WBAddress_out <= dataOUT(22 downto 20);
+RegWB_enable_out <= dataOUT(19);
+Inport_Or_ALU_out <= dataOUT(18);
+outport_DecEx_out <= dataOUT(17);
+MEM_Read_out <= dataOUT(16);
+Rsrc_out <= dataOUT(15 downto 13);
+MemWriteEnable_out <= dataOUT(12);
+SPEnable_out <= dataOUT(11);
+SelectorSP_out <= dataOUT(10);
+NewOrOldSP_out <= dataOUT(9);
+SP_Or_ALU_Result_out <= dataOUT(8);
+ReadData1_Or_PC_Added1_out <= dataOUT(7);
+WBValue_ALU_OR_Memory_out <= dataOUT(6);
+ReadData1_Or_ReadData2_out <= dataOUT(5 downto 4);
+jump_signal_out <= dataOUT(3 downto 2);
+jump_enable_out <= dataOUT(1);
+ret_signal_out <= dataOUT(0);
 end arch_DecodeExecute;
