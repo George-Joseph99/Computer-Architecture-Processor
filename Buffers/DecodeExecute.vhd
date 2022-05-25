@@ -73,14 +73,17 @@ generic (n : integer:= 189);
         q : out std_logic_vector(n-1 downto 0)
     );
 end component;
+
 signal dataIN : std_logic_vector(188 downto 0);
 signal dataOUT : std_logic_vector(188 downto 0);
 signal En : std_logic;
+
 begin
 dataIN <= PC_Added1_in & inport_in & ReadData1_in & ReadData2_in & ExtendedImmOrOffset_in & ALU_OP_in & ReadData2_Or_Imm_in & WBAddress_in & RegWB_enable_in & Inport_Or_ALU_in & outport_DecEx_in --inputs
 & MEM_Read_in & Rsrc_in & MemWriteEnable_in & SPEnable_in & SelectorSP_in & NewOrOldSP_in & SP_Or_ALU_Result_in & ReadData1_Or_PC_Added1_in & WBValue_ALU_OR_Memory_in & ReadData1_Or_ReadData2_in -- second operand and memory and stack control
 & jump_signal_in & jump_enable_in & ret_signal_in; --jump signals
 En <= '0' when stall = '1' else '1';
+
 reg: mynDFF port map(clk,flush,En,dataIN,dataOUT);
 
 PC_Added1_out <= dataOUT(188 downto 157);

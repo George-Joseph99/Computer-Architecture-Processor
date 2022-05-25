@@ -57,11 +57,13 @@ end component;
 signal dataIN : std_logic_vector(108 downto 0);
 signal dataOUT : std_logic_vector(108 downto 0);
 signal En : std_logic;
+
 begin
 dataIN <= PC_Added_in & ALU_Result_in & ReadData1_in & WBAddress_in & RegWB_enable_in --inputs
 & MemWriteEnable_in & SPEnable_in & SelectorSP_in & NewOrOldSP_in & SP_Or_ALU_Result_in & ReadData1_Or_PC_Added1_in & WBValue_ALU_OR_Memory_in & MEM_Read_in -- memory and stack
 & ret_signal_in; -- jumps
 En <= '0' when stall = '1' else '1';
+
 reg: mynDFF port map(clk,flush,En,dataIN,dataOUT);
 
 PC_Added_out <= dataOUT(108 downto 77);

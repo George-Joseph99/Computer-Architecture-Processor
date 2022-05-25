@@ -26,13 +26,17 @@ generic (n : integer:= 96);
         q : out std_logic_vector(n-1 downto 0)
     );
 end component;
+
 signal dataIn : std_logic_vector(95 downto 0);
 signal dataOut : std_logic_vector(95 downto 0);
 signal En : std_logic;
+
 begin 
 dataIn <= PC_Added_in & instruction_in & inport_in;
 En <= '0' when stall = '1' else '1';
+
 Reg: mynDFF port map(clk,flush,En,dataIn,dataOut);
+
 PC_Added_out <= dataOut(95 downto 64);
 instruction_out <= dataOut(63 downto 32);
 inport_out <= dataOut(31 downto 0);
