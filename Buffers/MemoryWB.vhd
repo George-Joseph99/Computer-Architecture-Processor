@@ -20,7 +20,7 @@ entity MemoryWB is
 end MemoryWB;
 
 architecture arch_MemoryWB of MemoryWB is
-component mynDFF is
+component DFF is
 generic (n : integer:= 69);
     port(
         clk,rst,enable : in std_logic;
@@ -38,7 +38,7 @@ dataIN <= MemoryData_in & ALU_Result_in & WBAddress_in & RegWB_enable_in
 & WBValue_ALU_OR_Memory_in;
 En <= '0' when stall = '1' else '1';
 
-reg: mynDFF port map(clk,flush,En,dataIN,dataOUT);
+reg: DFF port map(clk,flush,En,dataIN,dataOUT);
 
 MemoryData_out <= dataOUT(68 downto 37);
 ALU_Result_out <= dataOUT(36 downto 5);
