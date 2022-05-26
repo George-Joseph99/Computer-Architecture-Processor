@@ -42,7 +42,6 @@ else (CU_Signal2); -- ReadData2 or Immediate or ALU result or WB value
 
 First_Operand_Selector <= "01" when (Rsrc1 = AddressRdstInEx and WBEnableInEx = '1') -- ALU result (execution to execution forwarding)
 else "10" when (Rsrc1 = AddressRdstInMem and WBEnableInMem = '1') -- WB value (memory to execution forwarding)
-else "00" when CU_Signal1 = "11"
-else (CU_Signal1);
+else "00";
 
 end arch_ForwardUnit;
