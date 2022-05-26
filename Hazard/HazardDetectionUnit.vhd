@@ -1,5 +1,5 @@
 library ieee;
-use iee.std_logic_1164.all;
+use ieee.std_logic_1164.all;
 
 entity HazardDetectionUnit is
     port(
@@ -13,7 +13,7 @@ entity HazardDetectionUnit is
         JumpOrNot : in std_logic;
         RetSignal : in std_logic; --from memory
         PCSelector : out std_logic_vector(1 downto 0);
-        FlushSignal : out std_logic;
+        FlushSignal : out std_logic
     );
 end HazardDetectionUnit;
 
@@ -28,9 +28,9 @@ StallSignal <= '1' when (ExMemRead = '1' and ((EXRdst = Rsrc1) or (EXRdst = Rsrc
 
 --for jumps
 
-PCSelector <= '01' when (JumpOrNot = '1' and RetSignal = '0') 
-    else '10' when RetSignal = '1'
-    else '00';
+PCSelector <= "01" when (JumpOrNot = '1' and RetSignal = '0') 
+    else "10" when RetSignal = '1'
+    else "00";
 
 FlushSignal <= '1' when (JumpOrNot = '1' and RetSignal = '1') -- we flush buffer at ID/EX stage
     else '0';
