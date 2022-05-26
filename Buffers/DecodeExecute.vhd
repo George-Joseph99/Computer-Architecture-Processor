@@ -64,7 +64,7 @@ entity DecodeExecute is
 end DecodeExecute;
 
 architecture arch_DecodeExecute of DecodeExecute is
-component mynDFF is
+component DFF is
     -- 174 + 9 + 4 + 4 = 189 bits
 generic (n : integer:= 189);
     port(
@@ -84,7 +84,7 @@ dataIN <= PC_Added1_in & inport_in & ReadData1_in & ReadData2_in & ExtendedImmOr
 & jump_signal_in & jump_enable_in & ret_signal_in; --jump signals
 En <= '0' when stall = '1' else '1';
 
-reg: mynDFF port map(clk,flush,En,dataIN,dataOUT);
+reg: DFF port map(clk,flush,En,dataIN,dataOUT);
 
 PC_Added1_out <= dataOUT(188 downto 157);
 inport_out <= dataOUT(156 downto 125);

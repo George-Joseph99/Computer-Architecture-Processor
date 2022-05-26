@@ -44,7 +44,7 @@ entity ExecuteMemory is
 end ExecuteMemory;
 
 architecture arch_ExecuteMemory of ExecuteMemory is
-component mynDFF is
+component DFF is
         -- 100 + 8 + 1 = 109 bits
 generic (n : integer:= 109);
     port(
@@ -64,7 +64,7 @@ dataIN <= PC_Added_in & ALU_Result_in & ReadData1_in & WBAddress_in & RegWB_enab
 & ret_signal_in; -- jumps
 En <= '0' when stall = '1' else '1';
 
-reg: mynDFF port map(clk,flush,En,dataIN,dataOUT);
+reg: DFF port map(clk,flush,En,dataIN,dataOUT);
 
 PC_Added_out <= dataOUT(108 downto 77);
 ALU_Result_out <= dataOUT(76 downto 45);
