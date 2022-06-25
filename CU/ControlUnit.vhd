@@ -1,8 +1,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 USE IEEE.numeric_std.all;
-
---ReadPCAddedOrImm ->pcSelector (2 bits)
+--new alu control for adding for memory operations because it affects flags differently(DONE)
+--jump imm operations --> add them to ReadData2_Immediate signal
+--LDM operation should write back whick value in the register? yes writes back the value from alu result (DONE)
+--ReadPCAddedOrImm ->pcSelector (2 bits) (Done)
 
 entity ControlUnit is
   port (
@@ -10,18 +12,18 @@ entity ControlUnit is
     stall_pipeline: in std_logic;
     ALU_Control : out std_logic_vector(3 downto 0);
     
-    MemoryWriteEnable: out std_logic;
+    MemoryWriteEnable: out std_logic; 
 
     ----------Stack -----------
     SPEnable: out std_logic;
     AddORSub_SP: out std_logic; --------------add or subtract SP
     NewOrPrev_SP: out std_logic; --------------Output the Value after Add/sub or before the Add/sub
     SPOrALUResult: out std_logic; -----------Memory Adress from ALU OR from SP
-    ReadPCAddedOrImm: out std_logic; --Imm For Call
+    ReadPCAddedOrImm: out std_logic_vector (1 downto 0); --Imm For Call --M[index+2]
 
     -------Write enable-------------
     RegisterWriteEnable: out std_logic;
-    WBValueALUorMemory: out std_logic;
+    WBValueALUorMemory: out std_logic_vector(1 downto 0);
     
 
     
@@ -54,14 +56,14 @@ begin
     else      		("1111") when ((OP = "01101") and stall_pipeline /='1') --IAdd  
     else      		("1101") when ((OP = "01011") and stall_pipeline /='1') --Sub 
     else      		("1110") when ((OP = "01100") and stall_pipeline /='1') --And 
-    else      		("1100") when ((OP = "10011" or OP = "10100" ) and stall_pipeline /='1')  ----Adding for load and store Operations
+    else      		("1011") when ((OP = "10011" or OP = "10100" ) and stall_pipeline /='1')  ----Adding for load and store Operations
     else      		("0000"); ----------NOP and any other Operation
    
     -- RegisterWriteEnable is 1 for NOT, INC,IN
     -- MOV ,SWAP ,ADD ,SUB ,AND , IADD
     -- POP ,LDM ,LDD else it's 0
     RegisterWriteEnable <= ('1') when ((OP = "00011" or OP = "00100" or OP = "00110" 
-    or OP = "01000" or OP = "01000"  or OP = "01001" or OP = "01010" or OP = "01011" or OP = "01100"  or OP = "01101"  
+    or OP = "01000" or OP = "01001" or OP = "01010" or OP = "01011" or OP = "01100"  or OP = "01101"  
     or OP = "10001" or OP = "10010" or OP = "10011" ) and stall_pipeline /='1')
     else ('0');
 
@@ -74,22 +76,23 @@ begin
     else ('0');
 
     --MemoryWriteEnable is 1 for PUSH(in stack which is part of memory) ,STORE, CALL,INT else it's 0
-    MemoryWriteEnable <= ('1') when (OP = "10000" or OP = "10100" or OP = "11100" or OP = "11110") 
+    MemoryWriteEnable <= ('1') when (OP = "10000" or OP = "10100" or OP = "11100" or OP = "11110") and (stall_pipeline /='1')
     else ('0');
 
     --ALU source1 selection (01) for IADD , LDM ,LDD ,STD else 00
-    ReadData2_Immediate <= ("01") when (OP = "01101" or OP = "10010" or OP = "10011" or OP = "10100" ) 
+    ReadData2_Immediate <= ("01") when (OP = "01101" or OP = "10010" or OP = "10011" or OP = "10100" or OP = "11100") 
     else  ("00");
     
-    --ALU source2 selection (01) for STD ,LDD else 00 --!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ReadData1_ReadData2 <= ("01") when (OP = "10011" or OP = "10100")
+    --ALU source2 selection (01) for STD ,LDD else 00 
+    ReadData1_ReadData2 <= ("11") when (OP = "10100")
     else ("00");
 
     --writeBack value is from memory for POP , LDD operations else writeback ALU result
-    WBValueALUorMemory <= ('0') when (OP = "10001" or OP = "10011")
-    else ('1');
+    WBValueALUorMemory <= ("00") when (OP = "10001" or OP = "10011")
+    else ("01") when (OP = "10010")
+    else ("10");
 
-    --SPEnable for PUSH ,POP,CALL,RET,INT,RTI
+    --SPEnable for PUSH,POP,CALL,RET,INT,RTI
     SPEnable <= ('1') when ((OP = "10000" or OP = "10001" or OP = "11100" or OP = "11101" or OP = "11110" or OP = "11111") and stall_pipeline /='1')
     else ('0');
 
@@ -107,9 +110,10 @@ begin
 
 
 
-    --(0): use Imm as PC value for CALL operation----else (1): use PC+1
-    ReadPCAddedOrImm <= ('0') when (OP = "11100")
-    else ('1'); 
+    --(0): use Imm as PC value for CALL operation---- (1):M[index+2]  and (2) PC+1
+    ReadPCAddedOrImm <= ("00") when (OP = "11100") --call
+ 	           else ("01") when (OP = "11110")--INT 
+    		   else ("10"); --pc+1
 
     --!!!!!!!!!!!!!!!!!!!!!!!!!!! should we have a signal to indicate whether PC=PC+1 or PC=M[index+1] for RTI
 

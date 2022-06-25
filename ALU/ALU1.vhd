@@ -6,7 +6,6 @@ use IEEE.numeric_std.all;
 entity ALU1 is
 port(
 A,B: in std_logic_vector(31 downto 0);
-carryIn : in std_logic;
 sel: in std_logic_vector(3 downto 0);
 reset: in std_logic;
 result :out std_logic_vector(31 downto 0);
@@ -25,6 +24,9 @@ signal tempResult : std_logic_vector (31 downto 0);
 signal incrementedA : std_logic_vector (32 downto 0);
 Signal addingResult: std_logic_vector(32 downto 0);
 Signal subtractingResult: std_logic_vector(32 downto 0);
+Signal cf: std_logic;
+Signal nf: std_logic;
+Signal zf: std_logic;
 begin
 
 tempA <= '0' & A; --temp input variables with extra bit for overflow
@@ -39,33 +41,48 @@ subtractingResult  <= std_logic_vector(signed(tempA(32 downto 0)) - signed(tempB
 --SUB -> 1101
 --AND -> 1110
 --IADD -> 1111
--- zeros-> 0000
+-- zeros-> 0000 NOP
+-- add for memory operation ->1011
 -- A ->0011 (MOV)
+
 tempResult <= (not A) when sel = "0001"
 else      (incrementedA(31 downto 0)) when sel = "0010"
-else      (addingResult(31 downto 0))   when sel = "1100" or sel = "1111"
+else      (addingResult(31 downto 0))   when sel = "1100" or sel = "1111" or sel ="1011"
 else      (subtractingResult(31 downto 0))   when sel = "1101" 
 else      (A and B) when sel = "1110"
 else      (A)          when sel = "0011"
-else      (others =>'0') when sel = "0000" or sel="0111";
+else      (others =>'0') when sel = "0000" or sel="0111" or sel = "1000";--NOP ,setC
 
 result <= tempResult(31 downto 0);
 
-carryOut <= addingResult(32) when sel="1100" or sel = "1111"  -- ADD/IADD
+cf <= addingResult(32) when sel="1100" or sel = "1111"  -- ADD/IADD
 else        subtractingResult(32) when sel="1101" --SUB
 else        incrementedA(32) when sel="0010" --INC
 else	    ('1') when sel = "0111" --setC
-else        ('0') when reset ='1';
---else        (carryOut);
+else        ('0') when reset ='1'
+else        (cf) when sel="1011" or sel="0000" or sel="0011"--add for memory operation,Nop,Mov
+else        ('0');
 
-carryEnable <= '1' when sel= "1100" or sel="0010" or sel="1111" or sel="0111" or sel="1101" --ADD/INC/IADD/setC/sub
-else           '0';
+carryEnable <= '0' when sel= "0000" or sel="0011" or sel="1011"  --MOV/NOP/add for memory operations
+else           '1';
 
-zeroFlag  <= '1' when tempResult(31 downto 0) = x"00000000" 
+
+--carryEnable <= '1' when sel= "1100" or sel="0010" or sel="1111" or sel="0111" or sel="1101" --ADD/INC/IADD/setC/sub
+--else           '0';
+
+zf  <= '1' when (tempResult(31 downto 0) = x"00000000") and (sel /="0000" and sel /="0011" and sel /= "0111" and sel /="1011") --MOV ,setC,zeros output
+else        (zf) when sel ="0000" or sel ="0011" or sel= "0111" or sel = "1011" ----MOV ,setC,zeros output,add for memory operations
 else        ('0') when reset ='1'
 else         '0' ;
 
-negativeFlag    <= '1' when tempResult(31) = '1' 
-else              ('0') when reset ='1'
-else               '0' ;
+nf    <= '1' when (tempResult(31) = '1') and (sel /="0000" and sel /="0011" and sel /= "0111" and sel /="1011") 
+else     (nf) when sel ="0000" or sel ="0011" or sel= "0111" or sel = "1011"----MOV ,setC,zeros output,add for memory operations
+else     ('0') when reset ='1'
+else      '0' ;
+
+
+CarryOut <=  cf;
+zeroFlag <= zf;
+negativeFlag <=nf;
+
 end arch1;

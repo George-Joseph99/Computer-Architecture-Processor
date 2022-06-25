@@ -16,7 +16,7 @@ END ENTITY;
 
 ARCHITECTURE arch1 OF registerFile1 IS
 
-COMPONENT DFF IS
+COMPONENT nDFF IS
 GENERIC ( n : integer := 32);
 PORT( clk,rst,enable : IN std_logic; 
 d : IN std_logic_vector(n-1 DOWNTO 0);
@@ -47,14 +47,14 @@ dRead2: decoder3x8 PORT MAP(srcEnable,readAddress2,d2Read);
 dWrite: decoder3x8 PORT MAP(distEnable,WriteAddress,d3Write);
 
 
-u0: DFF PORT MAP (clk,rst,d3Write(0),WriteData,s0);
-u1: DFF PORT MAP (clk,rst,d3Write(1),WriteData,s1);
-u2: DFF PORT MAP (clk,rst,d3Write(2),WriteData,s2);
-u3: DFF PORT MAP (clk,rst,d3Write(3),WriteData,s3);
-u4: DFF PORT MAP (clk,rst,d3Write(4),WriteData,s4);
-u5: DFF PORT MAP (clk,rst,d3Write(5),WriteData,s5);
-u6: DFF PORT MAP (clk,rst,d3Write(6),WriteData,s6);
-u7: DFF PORT MAP (clk,rst,d3Write(7),WriteData,s7);
+u0: nDFF PORT MAP (clk,rst,d3Write(0),WriteData,s0);
+u1: nDFF PORT MAP (clk,rst,d3Write(1),WriteData,s1);
+u2: nDFF PORT MAP (clk,rst,d3Write(2),WriteData,s2);
+u3: nDFF PORT MAP (clk,rst,d3Write(3),WriteData,s3);
+u4: nDFF PORT MAP (clk,rst,d3Write(4),WriteData,s4);
+u5: nDFF PORT MAP (clk,rst,d3Write(5),WriteData,s5);
+u6: nDFF PORT MAP (clk,rst,d3Write(6),WriteData,s6);
+u7: nDFF PORT MAP (clk,rst,d3Write(7),WriteData,s7);
 
 
 
